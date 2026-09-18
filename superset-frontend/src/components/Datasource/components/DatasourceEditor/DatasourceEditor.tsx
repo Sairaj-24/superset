@@ -110,6 +110,7 @@ import {
   clearMappingTransforms,
   defaultTransformFor,
   nextMappedColumnOverride,
+  partitionFilterMappingEnabled,
 } from './components/PartitionFilterMapping/utils';
 import {
   DEFAULT_COLUMNS_FOLDER_UUID,
@@ -619,10 +620,7 @@ function ColumnCollectionTable({
   onMonotonicChange,
   expandedColumnName,
 }: ColumnCollectionTableProps): JSX.Element {
-  const partitionMappingEnabled =
-    isFeatureEnabled(FeatureFlag.PartitionFilterMapping) &&
-    Boolean(datasource) &&
-    Boolean(datasource?.supports_partition_filter_mapping);
+  const partitionMappingEnabled = partitionFilterMappingEnabled(datasource);
   const partitionColumn = partitionMappingEnabled
     ? datasource?.partition_column
     : null;
@@ -1928,7 +1926,7 @@ function DatasourceEditor({
               data-test="currency-code-column-select"
             />
           </Flex>
-          {isFeatureEnabled(FeatureFlag.PartitionFilterMapping) && (
+          {partitionFilterMappingEnabled(datasource) && (
             <PartitionColumnFields
               datasource={datasource}
               columns={databaseColumns}
