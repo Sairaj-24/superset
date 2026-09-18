@@ -31,6 +31,7 @@ import {
 } from '@superset-ui/core/components';
 import { usePartitionMappingPreview } from './usePartitionMappingPreview';
 import {
+  IDENTITY_TRANSFORM,
   partitionRowState,
   previewOperatorFor,
   sampleValuesFor,
@@ -183,7 +184,16 @@ export default function PartitionMappingSection({
         </Flex>
         <Input
           value={transform}
-          onChange={event => onChange?.(event.target.value || null)}
+          onChange={event => {
+            const next = event.target.value || null;
+            onChange?.(next);
+            // Monotonicity is a property of the expression, so editing the
+            // transform re-opens the question. The identity `:value` provably
+            // preserves ordering and stays auto-declared; anything else is the
+            // owner's to declare, and editing away from `:value` must not leave
+            // a stale auto-check behind.
+            onMonotonicChange(columnName, next === IDENTITY_TRANSFORM);
+          }}
           placeholder={t('unix_timestamp(:value)')}
           aria-label={t('Value transform')}
           data-test="partition-value-transform"
